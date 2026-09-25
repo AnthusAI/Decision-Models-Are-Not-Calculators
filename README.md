@@ -1,31 +1,31 @@
 # Decision Models Are Not Calculators
 
-Someone rolls a fair six-sided die where nobody can see it. We know it landed
-on a face, but not which one. Each face still has a one-in-six chance. What
-happens if we ask a decision model to name the face anyway?
+Jev chose **one** in every one of 2,880 requests about an unseen fair die.
+It did so whether one was first or last in the choice list, and whether the
+faces were written as digits or words. That looked remarkably like the result
+we had wondered about after writing [The Dominance of Ones](https://anth.us/blog/the-dominance-of-ones/).
+Had a preference for one found its way into a decision model?
 
-We asked three. **Jev chose one every time. Kev chose one about half the time.
-Laya mostly chose six.** The models returned well-formed answers and
-probabilities, but they had no information about the roll. This is a study of
-their responses to a question, not a way to discover what happened behind the
-screen.
+## The hypothesis
 
-![Response-derived comparison of die-face probabilities: Jev favors one, Kev is comparatively flat, and Laya favors six](images/decision-models-are-not-calculators-cover.png)
+Benford's Law describes the leading digits of certain observed numerical
+datasets: one appears more often than the other digits. That suggested a
+possibility, not a rule for AI: if such numerical patterns are common in a
+model's training data, perhaps the model will favor `1` when it must choose
+among die faces without evidence about the result.
 
-The question grew out of [The Dominance of Ones](https://anth.us/blog/the-dominance-of-ones/),
-an article about Benford's Law. In many numerical datasets, one appears as a
-*leading digit* more often than the other digits. Could a related imbalance in
-training data make a model favor one when it has to choose a die face? That is
-an interesting hypothesis. The three models give us a useful test of the
-prediction, but not a test of its proposed cause.
+A fair six-sided die does not follow that leading-digit distribution. When
+the roll is hidden, each face has the same one-in-six chance. Our hypothesis
+was about a *model's prediction*, not about the die. We could test whether
+the models favored one; we could not inspect their training data or prove why
+they did so.
 
-## One roll, three answers
+## How we investigated
 
 The state said, "A fair six-sided die was rolled once. The result is unknown."
 The question asked, "Which face showed on the roll?" The alternatives were the
-six marked faces. Here is one [actual digit-labelled request](results/examples.json),
-shown with Jev's model identifier. Kev received the same envelope with
-`"model": "kev-latest"`; Laya's field was `"model": "english"`.
+six marked faces. Here is one [actual digit-labelled request](results/examples.json)
+sent to Jev:
 
 ```json
 {
@@ -48,10 +48,43 @@ shown with Jev's model identifier. Kev received the same envelope with
 }
 ```
 
-For that exact order, these are the selected choices and returned per-face
-probabilities. The [example file](results/examples.json) retains the complete,
-unedited request and response envelopes. These are the models' reported choice
-probabilities, not calibrated probabilities that a guess is correct.
+Six alternatives have **720 possible orders**. We tested every order with
+digit labels (`1` through `6`), then with word labels (`one` through `six`),
+and repeated both sets. That made 2,880 requests per model and **8,640 valid
+responses** across Jev, Kev, and Laya. Each face appeared at every list
+position exactly 120 times per label form and pass. The
+[preregistered protocol](docs/PREREGISTERED.md) fixed this matrix before the
+runs; the [release manifest](results/release-manifest.json) confirms that all
+planned requests returned valid responses. The models never observed a roll.
+
+## Jev: the result that fit
+
+In the request shown above, Jev selected `1` and returned these choice
+probabilities:
+
+| Face | 1 | 2 | 3 | 4 | 5 | 6 |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Jev's reported probability | .88 | .01 | .02 | .05 | .01 | .03 |
+
+This was not a one-off. Jev selected face one in **all 2,880 replies**.
+In every digit-labelled request, one was the unique highest-probability face.
+Across the first digit pass, its mean returned probability for one was
+**89.7%**, versus **4.4%** for six. The same preference survived the word
+labels: Jev selected `one` in every word-labelled request too.
+
+This is the distribution we thought we might see if the model had acquired a
+strong preference for one. It is consistent with the Benford-inspired
+hypothesis. It does **not** establish that Benford's Law, or the frequency of
+any token in Jev's training data, caused the pattern.
+
+## Then we tried the other models
+
+Jev's result made the hypothesis feel promising. Would the preference for one
+show up in other decision models? Kev and Laya received the same state,
+question, and alternatives. The request envelope differed only in its model
+field: `"kev-latest"` for Kev and
+`"english"` for Laya. Their responses to the exact digit order shown above
+already looked different:
 
 | Model | Selected face | P(1) | P(2) | P(3) | P(4) | P(5) | P(6) |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -59,20 +92,13 @@ probabilities, not calibrated probabilities that a guess is correct.
 | Kev | 6 | .1734 | .1172 | .1687 | .1623 | .1809 | .1975 |
 | Laya | 1 | .3988 | .2483 | .1496 | .0723 | .0531 | .0780 |
 
-Laya chose one in this example, yet six was its overwhelming favorite across
-the full experiment. One screenshot of one response would have told the wrong
-story.
+These are actual selected choices and reported choice probabilities, not
+calibrated probabilities that a guess is correct. The
+[example file](results/examples.json) preserves the complete, unedited
+request and response envelopes. Notice that Laya chose one in this *single*
+order. We needed the whole matrix to see its usual behavior.
 
-## Every order of the choices
-
-Six alternatives have **720 possible orders**. We tested every order with
-digit labels (`1` through `6`), then with word labels (`one` through `six`),
-and repeated both sets. That made 2,880 requests per model and **8,640 valid
-responses** in all. The [preregistered protocol](docs/PREREGISTERED.md) fixed
-the matrix before the runs. Within each label form and pass, every face
-appeared at every list position exactly 120 times.
-
-The [released summary](results/summary.json) gives the main result:
+The [released summary](results/summary.json) gives the full contrast:
 
 | Model | Face 1 selected, all 2,880 replies | Face 6 selected, all 2,880 replies | Mean P(1), digit pass 1 | Mean P(6), digit pass 1 |
 | --- | ---: | ---: | ---: | ---: |
@@ -80,27 +106,27 @@ The [released summary](results/summary.json) gives the main result:
 | Kev | 1,410 (49.0%) | 294 | 18.6% | 18.4% |
 | Laya | 40 | 2,610 (90.6%) | 6.5% | 66.2% |
 
-Jev made one the unique highest-probability face in every digit-labelled
-request, as well as selecting it in every word-labelled request. Kev's mean
-digit probabilities were comparatively close to the fair-die baseline of
-16.7% per face, although its *selected answers* still favored one. In the
-first pass, Kev selected one in 219 digit-labelled orders and 486 word-labelled
-orders. A fairly flat average probability distribution does not guarantee
-evenly distributed selections: each selection is made from the probabilities
-for one particular order. Laya strongly favored six, selecting it in 589
-digit-labelled and 716 word-labelled orders in the first pass. Its mean
-P(six) with word labels was **91.8%**. The literal "always one" prediction held
-for Jev and failed for Kev and Laya.
+Kev did have a preference for one in its *selected answers*: 1,410 of 2,880
+(49.0%). But it did not behave like Jev. In the first pass, Kev selected one
+in 219 digit-labelled orders and 486 word-labelled orders; its mean digit
+probabilities were comparatively close to the one-in-six baseline. A fairly
+flat *average* probability distribution does not guarantee evenly distributed
+selections: each selection is made from one particular response.
 
-![Mean returned probability by semantic die face, model, and label form; the dashed baseline is one-sixth](images/decision-models-face-probabilities.png)
+Laya was the real reversal. It selected **six in 2,610 of 2,880 replies**
+(90.6%). In the first pass, that was 589 digit-labelled orders and 716
+word-labelled orders. Its mean reported P(six) with word labels was **91.8%**.
+So the Jev pattern was not a general rule for these decision models.
 
-We grouped probabilities by the *face* named in the alternative, not by where
-that alternative sat in the list. Moving `six` from first to last did not
-change which face its probability belonged to. The dashed line is the known
-one-in-six baseline for an unseen fair roll; it is not a probability measured
-by any of the models.
+![Response-derived comparison of die-face probabilities: Jev favors one, Kev is comparatively flat, and Laya favors six](images/decision-models-are-not-calculators-cover.png)
 
-## The list has a gravity of its own
+The [detailed face-probability chart](images/decision-models-face-probabilities.png)
+separates digits from words. We grouped probabilities by the *face* named in
+the alternative, not by where that alternative sat in the list. Its dashed
+line is the known one-in-six baseline for an unseen fair roll; it is not a
+probability measured by any of the models.
+
+## Could the choice list be part of the answer?
 
 The order of alternatives changed the pattern for Kev and Laya. In the first
 digit pass, Kev selected the **first-listed choice 426 of 720 times** (59.2%),
@@ -117,30 +143,26 @@ order, changed the selected face in **324 of 720 paired orders for Kev** and
 On exact repeats, all three models selected the same face for every matching
 request. Kev's and Laya's returned probabilities were identical on repeat;
 Jev's moved slightly without changing its choice. These are repeated model
-responses, not independent observations of die rolls.
+responses, not independent observations of die rolls. Choice order and label
+form plainly matter for Kev and Laya, but these tests do not tell us why each
+model behaves as it does.
 
-## What Benford's Law can—and cannot—explain
+## What can we conclude?
 
-Jev's result is compatible with the original intuition: it acts as though one
-has a strong prior even when the question supplies no evidence favoring that
-face. But **compatibility is not causation**. We did not inspect the models'
-training corpora, count their numeral tokens, or vary the training data. We
-cannot attribute Jev's behavior to Benford's Law, nor can we say why Kev and
-Laya returned different patterns. The three outcomes do rule out the broad
-claim that decision models *always* predict one in this setup.
+The prompt described a fair, unseen die. Its faces each had a one-in-six
+chance in that scenario; the returned numbers describe the models' responses
+to our prompt, not the outcome of the roll. **Benford's Law might help explain
+Jev's distribution of predictions.** We did not examine the training corpora, count
+leading digits or numeral tokens in them, or change training data to find
+out. Even for Jev, we observed a pattern consistent with the hypothesis, not
+its cause.
 
-Benford's Law describes the leading-digit distribution of certain observed
-numerical datasets. It does not say a fair die lands on one more often, and it
-does not by itself tell us how often a model saw the token `1`. The known
-probability of each unseen die face remains one in six. A model's choice
-probabilities describe its response to the prompt, not evidence about the
-hidden roll.
-
-If your application needs a fair die, use a random-number generator. If it
-needs a model to compare options, test the model on the decision distribution
-you care about. Rotate the alternatives, try equivalent labels, retain the
-returned probabilities, and pin the build. A structured response can be
-perfectly valid while carrying a preference you never intended to ask for.
+Kev's partial preference for one and Laya's strong preference for six do not
+fit the Jev pattern. Choice order and spelling affect their responses, but
+we cannot say from this experiment what produced either distribution. We can
+reject the sweeping claim that these decision models always predict one.
+Beyond that, we cannot explain why the three models gave such different
+answers.
 
 ## Reproduce and inspect the study
 

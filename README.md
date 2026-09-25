@@ -12,10 +12,9 @@ measuring the die or changing its odds. A single response cannot establish
 whether the model is calibrated. But why did it favor one so strongly over the
 other faces?
 
-The replies raised choice order as another possible explanation. A quick
-reversal reportedly made no difference. Anthus AI then called Benford's Law
-“the obvious answer” to Jev's preference for one. That was too certain. It
-was a hypothesis worth testing, not an explanation we had established.
+Anthus AI called Benford's Law “the obvious answer” to Jev's preference for
+one. That was too certain. It was a hypothesis worth testing, not an
+explanation we had established.
 
 ## The hypothesis
 
@@ -27,24 +26,19 @@ among die faces without evidence about the result. Our earlier article,
 [The Dominance of Ones](https://anth.us/blog/the-dominance-of-ones/), inspired
 that possibility.
 
-Favoring the *face marked 1* is different from favoring the *first option in
-the list*. If the label is what matters, the preference should follow one as
-we move it through the list. If list position matters, the preferred face
-should change when we reorder the options. The exchange about ordering gave
-us a direct way to check that distinction.
-
 The hypothesis was about a *model's prediction*, not about the die. We could
 test whether the models favored one; we could not inspect their training data
 or prove why they did so.
 
-## How we investigated
+## A preliminary result: Jev picks one
 
 The state said, "A fair six-sided die was rolled once. The result is unknown."
 The question asked, "Which face showed on the roll?" The alternatives were the
 six marked faces. Unlike the motivating screenshot, which asked about a
 future roll, our test asked about a completed roll with an unknown result.
 Both prompts give the model no evidence favoring any face. Here is one
-[actual digit-labelled request](results/examples.json) sent to Jev:
+[actual digit-labelled request](results/examples.json) with the faces in
+ordinary numerical order, sent to Jev:
 
 ```json
 {
@@ -67,34 +61,43 @@ Both prompts give the model no evidence favoring any face. Here is one
 }
 ```
 
-Six alternatives have **720 possible orders**. We tested every order with
-digit labels (`1` through `6`), then with word labels (`one` through `six`),
-and repeated both sets. That made 2,880 requests per model and **8,640 valid
-responses** across Jev, Kev, and Laya. Each face appeared at every list
-position exactly 120 times per label form and pass. The
-[preregistered protocol](docs/PREREGISTERED.md) fixed this matrix before the
-runs; the [release manifest](results/release-manifest.json) confirms that all
-planned requests returned valid responses. The models never observed a roll.
-
-## Jev: the result that fit
-
-In the request shown above, Jev selected `1` and returned these choice
-probabilities:
+Jev selected `1` and returned these choice probabilities for that request:
 
 | Face | 1 | 2 | 3 | 4 | 5 | 6 |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
 | Jev's reported probability | .88 | .01 | .02 | .05 | .01 | .03 |
 
-This was not a one-off. Jev selected face one in **all 2,880 replies**.
-In every digit-labelled request, one was the unique highest-probability face.
-Across the first digit pass, its mean returned probability for one was
-**89.7%**, versus **4.4%** for six. The same preference survived the word
-labels: Jev selected `one` in every word-labelled request too.
+The public screenshot put 81% beside one; our different, recorded prompt put
+88% there. Looked at alone, each result seems consistent with the idea that
+Jev favors one. But in both examples, **one was the first choice listed**.
+Neither example can tell us whether Jev favors the face marked `1` or just
+the first option in a list. Our recorded request was one member of the full
+test matrix, not a separate pilot experiment.
 
-This is the distribution we thought we might see if the model had acquired a
-strong preference for one. It is consistent with the Benford-inspired
-hypothesis. It does **not** establish that Benford's Law, or the frequency of
-any token in Jev's training data, caused the pattern.
+## Investigating the choice order
+
+The replies to the original post raised this alternative: perhaps Jev was
+favoring the *first slot*, not the *numeral one*. A quick reversal reportedly
+made no difference, but that still left most possible arrangements untested.
+If the numeral is what matters, the preference should follow `1` as it moves
+through the list. If position matters, the preferred face should change when
+we reorder the options.
+
+Six alternatives have **720 possible orders**. We tested all 720 with digit
+labels (`1` through `6`), then all 720 with word labels (`one` through `six`),
+and repeated both sets. Every face appeared at every list position exactly
+120 times per label form and pass. The [preregistered protocol](docs/PREREGISTERED.md)
+fixed that matrix before the runs.
+
+Jev chose face one in **all 2,880 requests**. In every digit-labelled request,
+one had the unique highest returned probability. It was selected 120 times
+from each of the six list positions in each digit pass, and it remained the
+choice in every word-labelled request. Across the first digit pass, Jev's
+mean reported P(1) was **89.7%**, versus **4.4%** for face six.
+
+That result survived a systematic order check. It is consistent with the
+Benford-inspired hypothesis, but it does **not** establish that Benford's
+Law—or the frequency of any token in Jev's training data—caused it.
 
 ## Then we tried the other models
 
@@ -117,7 +120,11 @@ calibrated probabilities that a guess is correct. The
 request and response envelopes. Notice that Laya chose one in this *single*
 order. We needed the whole matrix to see its usual behavior.
 
-The [released summary](results/summary.json) gives the full contrast:
+All three models received the 720 digit orders and 720 word orders twice:
+**8,640 valid responses** in total. The [release manifest](results/release-manifest.json)
+confirms that every planned request returned a valid response. The models
+never observed a roll. The [released summary](results/summary.json) gives
+the full contrast:
 
 | Model | Face 1 selected, all 2,880 replies | Face 6 selected, all 2,880 replies | Mean P(1), digit pass 1 | Mean P(6), digit pass 1 |
 | --- | ---: | ---: | ---: | ---: |
@@ -145,14 +152,13 @@ the alternative, not by where that alternative sat in the list. Its dashed
 line is the known one-in-six baseline for an unseen fair roll; it is not a
 probability measured by any of the models.
 
-## Could the choice list be part of the answer?
+## Ordering mattered for Kev and Laya
 
 The order of alternatives changed the pattern for Kev and Laya. In the first
 digit pass, Kev selected the **first-listed choice 426 of 720 times** (59.2%),
 even though each face spent exactly 120 of those orders in first position.
-Laya selected the **last-listed choice zero times** in that pass. Jev always
-selected face one, wherever it appeared, so its selected positions were
-evenly split: 120 at each of the six positions.
+Laya selected the **last-listed choice zero times** in that pass. Jev, by
+contrast, kept choosing face one wherever it appeared.
 
 ![Selected-option share by list position for each model and label form](images/decision-models-option-position.png)
 

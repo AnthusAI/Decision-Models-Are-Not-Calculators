@@ -1,10 +1,18 @@
 # Decision Models Are Not Calculators
 
-Jev chose **one** in every one of 2,880 requests about an unseen fair die.
-It did so whether one was first or last in the choice list, and whether the
-faces were written as digits or words. That looked remarkably like the result
-we had wondered about after writing [The Dominance of Ones](https://anth.us/blog/the-dominance-of-ones/).
-Had a preference for one found its way into a decision model?
+Imagine rolling a fair six-sided die where nobody can see the result. There
+is no reason to favor one face over another. Each has a one-in-six chance.
+
+What happens if we ask an AI system to choose a face anyway? The *decision
+models* in this study take a description and a list of possible answers, then
+return a choice and a probability for each option. We started with Jev. We
+asked it the hidden-die question 2,880 times, changing the order of the
+choices and sometimes spelling the numbers as words. Jev chose **one every time**.
+
+That result brought us back to
+[The Dominance of Ones](https://anth.us/blog/the-dominance-of-ones/), our
+article on Benford's Law. Could a pattern in numerical data be nudging Jev
+toward one?
 
 ## The hypothesis
 
@@ -14,11 +22,10 @@ possibility, not a rule for AI: if such numerical patterns are common in a
 model's training data, perhaps the model will favor `1` when it must choose
 among die faces without evidence about the result.
 
-A fair six-sided die does not follow that leading-digit distribution. When
-the roll is hidden, each face has the same one-in-six chance. Our hypothesis
-was about a *model's prediction*, not about the die. We could test whether
-the models favored one; we could not inspect their training data or prove why
-they did so.
+A fair six-sided die does not follow that leading-digit distribution. Our
+hypothesis was about a *model's prediction*, not about the die. We could test
+whether the models favored one; we could not inspect their training data or
+prove why they did so.
 
 ## How we investigated
 

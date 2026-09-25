@@ -1,20 +1,15 @@
 # Decision Models Are Not Calculators
 
-> “Jev predicts that a dice roll has 81% probability of rolling a 1, with
-> 77% confidence. That doesn't seem very calibrated to me.”
-
 Jev is a *decision model*: an AI system that selects an answer from a supplied
-list and reports a probability for each option. The reaction is
-understandable. On a fair six-sided die, each face has a one-in-six chance—about
-16.7%. The screen in that example showed **81% beside one** and a separate
-**77% confidence** value. Jev was scoring the choices in a prompt; it was not
-measuring the die or changing its odds. A single response cannot establish
-whether the model is calibrated. But why did it favor one so strongly over the
-other faces?
+list and reports a probability for each option. We asked it which face had
+shown on a fair six-sided die rolled out of sight. Jev chose one and assigned
+it 88% probability. With no information about the roll, every face still had
+the same one-in-six chance. Why did the model favor one so strongly?
 
-Anthus AI called Benford's Law “the obvious answer” to Jev's preference for
-one. That was too certain. It was a hypothesis worth testing, not an
-explanation we had established.
+We had a hypothesis inspired by Benford's Law. First we looked at Jev's
+answer. Then we moved one around the list of choices and asked two other
+decision models the same question. The results took us somewhere less tidy
+than our initial explanation.
 
 ## The hypothesis
 
@@ -32,11 +27,8 @@ or prove why they did so.
 
 ## A preliminary result: Jev picks one
 
-The state said, "A fair six-sided die was rolled once. The result is unknown."
-The question asked, "Which face showed on the roll?" The alternatives were the
-six marked faces. Unlike the motivating screenshot, which asked about a
-future roll, our test asked about a completed roll with an unknown result.
-Both prompts give the model no evidence favoring any face. Here is one
+Our first request described a fair die that had already been rolled, but whose
+result nobody saw. The model had no clue about which face showed. Here is one
 [actual digit-labelled request](results/examples.json) with the faces in
 ordinary numerical order, sent to Jev:
 
@@ -67,21 +59,17 @@ Jev selected `1` and returned these choice probabilities for that request:
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
 | Jev's reported probability | .88 | .01 | .02 | .05 | .01 | .03 |
 
-The public screenshot put 81% beside one; our different, recorded prompt put
-88% there. Looked at alone, each result seems consistent with the idea that
-Jev favors one. But in both examples, **one was the first choice listed**.
-Neither example can tell us whether Jev favors the face marked `1` or just
-the first option in a list. Our recorded request was one member of the full
-test matrix, not a separate pilot experiment.
+Taken alone, this answer looks like support for our hypothesis. But one was
+the **first-listed choice** in this request. Maybe Jev was following the top
+of a list. The recorded request belongs to our full test matrix. Viewed alone,
+it shows why we needed the rest of the test.
 
 ## Investigating the choice order
 
-The replies to the original post raised this alternative: perhaps Jev was
-favoring the *first slot*, not the *numeral one*. A quick reversal reportedly
-made no difference, but that still left most possible arrangements untested.
-If the numeral is what matters, the preference should follow `1` as it moves
-through the list. If position matters, the preferred face should change when
-we reorder the options.
+Perhaps Jev was favoring the *first slot*, not the *numeral one*. If the
+numeral is what matters, the preference should follow `1` as it moves through
+the list. If position matters, the preferred face should change when we
+reorder the options.
 
 Six alternatives have **720 possible orders**. We tested all 720 with digit
 labels (`1` through `6`), then all 720 with word labels (`one` through `six`),

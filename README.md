@@ -1,18 +1,24 @@
 # Decision Models Are Not Calculators
 
-Imagine rolling a fair six-sided die where nobody can see the result. There
-is no reason to favor one face over another. Each has a one-in-six chance.
+Sanyam Satia posted a Jev result with a fair question:
 
-What happens if we ask an AI system to choose a face anyway? The *decision
-models* in this study take a description and a list of possible answers, then
-return a choice and a probability for each option. We started with Jev. We
-asked it the hidden-die question 2,880 times, changing the order of the
-choices and sometimes spelling the numbers as words. Jev chose **one every time**.
+> “Jev predicts that a dice roll has 81% probability of rolling a 1, with
+> 77% confidence. That doesn't seem very calibrated to me.”
 
-That result brought us back to
-[The Dominance of Ones](https://anth.us/blog/the-dominance-of-ones/), our
-article on Benford's Law. Could a pattern in numerical data be nudging Jev
-toward one?
+Jev is a *decision model*: an AI system that selects an answer from a supplied
+list and reports a probability for each option. The reaction is
+understandable. On a fair six-sided die, each face has a one-in-six chance—about
+16.7%. The screen in that example showed **81% beside one** and a separate
+**77% confidence** value. Jev was scoring the choices in a prompt; it was not
+measuring the die or changing its odds. A single response cannot establish
+whether the model is calibrated. But why did it favor one so strongly over the
+other faces?
+
+In the replies, someone suggested reversing the order of the choices.
+Satia tried changing the order and reported that it did not seem to make a
+difference. Anthus AI then called Benford's Law “the obvious answer” to
+Jev's preference for one. That was too certain. It was a hypothesis worth
+testing, not an explanation we had established.
 
 ## The hypothesis
 
@@ -20,19 +26,28 @@ Benford's Law describes the leading digits of certain observed numerical
 datasets: one appears more often than the other digits. That suggested a
 possibility, not a rule for AI: if such numerical patterns are common in a
 model's training data, perhaps the model will favor `1` when it must choose
-among die faces without evidence about the result.
+among die faces without evidence about the result. Our earlier article,
+[The Dominance of Ones](https://anth.us/blog/the-dominance-of-ones/), inspired
+that possibility.
 
-A fair six-sided die does not follow that leading-digit distribution. Our
-hypothesis was about a *model's prediction*, not about the die. We could test
-whether the models favored one; we could not inspect their training data or
-prove why they did so.
+Favoring the *face marked 1* is different from favoring the *first option in
+the list*. If the label is what matters, the preference should follow one as
+we move it through the list. If list position matters, the preferred face
+should change when we reorder the options. The exchange about ordering gave
+us a direct way to check that distinction.
+
+The hypothesis was about a *model's prediction*, not about the die. We could
+test whether the models favored one; we could not inspect their training data
+or prove why they did so.
 
 ## How we investigated
 
 The state said, "A fair six-sided die was rolled once. The result is unknown."
 The question asked, "Which face showed on the roll?" The alternatives were the
-six marked faces. Here is one [actual digit-labelled request](results/examples.json)
-sent to Jev:
+six marked faces. Unlike the motivating screenshot, which asked about a
+future roll, our test asked about a completed roll with an unknown result.
+Both prompts give the model no evidence favoring any face. Here is one
+[actual digit-labelled request](results/examples.json) sent to Jev:
 
 ```json
 {

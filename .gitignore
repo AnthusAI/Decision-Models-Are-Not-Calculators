@@ -9,4 +9,5 @@ __pycache__/
 *.egg-info/
 .DS_Store
 data/errors/
+data/answers/*.jsonl
 !images/.gitkeep

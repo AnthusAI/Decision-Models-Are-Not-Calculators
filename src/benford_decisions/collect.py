@@ -82,11 +82,20 @@ async def run_engine(engine: str, output: Path, cap: float = DEFAULT_CAP) -> dic
         if record["status"] != "ok":
             print(f"{engine} {job.request_id}: {record['error_type']}: {record['error']}",
                   file=sys.stderr, flush=True)
+            # One adapter/protocol failure may be systemic; stop before repeating it
+            # across thousands of requests. The failed ID remains retryable.
+            break
         if index % 60 == 0 or index == len(pending):
             print(f"{engine}: processed {index}/{len(pending)} remaining requests", flush=True)
     final_rows = read_jsonl(output)
     final_ok = [row for row in final_rows if row.get("status") == "ok"]
-    result = summarize(final_ok)["engines"][engine]
+    if final_ok:
+        result = summarize(final_ok)["engines"][engine]
+    else:
+        final_ids = {row["request_id"] for row in final_rows if row.get("status") == "ok"}
+        result = {"successful": len(final_ids), "expected": len(planned),
+                  "complete": False,
+                  "missing_request_ids": sorted({job.request_id for job in planned} - final_ids)}
     return result
 
 

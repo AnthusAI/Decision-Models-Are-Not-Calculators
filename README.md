@@ -48,14 +48,16 @@ revision documented in [`docs/engines.md`](docs/engines.md):
 
 ```sh
 python -m pip install -e '.[laya]'
+export LAYA_CHECKPOINT_PATH=/path/to/55cf4c4ebb4ebe31b2550e8bdf3bd21b99753851
 benford-decisions run --engine laya
 ```
 
-The runner checkpoints each response. Re-running skips completed request IDs;
-`--retry-failed` retries previously failed jobs. Results are accepted only when
-the expected model identity and response shape are present. Raw records are
-written to `data/answers/<engine>.jsonl`; do not overwrite a record from a
-different registered model identity.
+The runner checkpoints each response. Re-running skips completed request IDs
+and retries the first failed or unattempted request. It stops at the first
+error to avoid repeating a systemic failure across thousands of calls. Results
+are accepted only when the expected model identity and response shape are
+present. Raw local records are written to `data/answers/<engine>.jsonl`; clean,
+complete, checksummed replay archives are exported by the `release` command.
 
 ```sh
 benford-decisions summarize --engine all
@@ -65,8 +67,9 @@ benford-decisions charts
 
 ## Reproduce the published results
 
-The committed response archive, SHA-256 manifest, run provenance, summaries,
-and figure-generation command are listed in [`results/README.md`](results/README.md).
+After all three engines are complete, create the committed response archives,
+SHA-256 manifest, run provenance, summaries, and exact example request/reply
+records with `benford-decisions release`. See [`results/README.md`](results/README.md).
 The summary code makes no model calls. It verifies complete permutation
 coverage and regenerates the article data from the raw answer record.
 

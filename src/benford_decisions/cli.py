@@ -10,6 +10,7 @@ from pathlib import Path
 from .collect import DEFAULT_CAP, DEFAULT_DATA, _estimate_jev_cost, run_engine
 from .engines import make_adapter
 from .records import read_jsonl
+from .release import build_release
 from .study import ENGINE_NAMES, jobs
 from .summary import summarize
 
@@ -72,6 +73,7 @@ def main() -> None:
     summary.add_argument("--engine", choices=(*ENGINE_NAMES, "all"), default="all")
     summary.add_argument("--output", type=Path)
     commands.add_parser("charts", help="generate the social image and result plots")
+    commands.add_parser("release", help="validate all runs and export checksummed responses")
     args = parser.parse_args()
     if args.command == "plan":
         output = {engine: {"requests": len(list(jobs(engine))),
@@ -89,3 +91,6 @@ def main() -> None:
         raise SystemExit(_summary(args))
     elif args.command == "charts":
         raise SystemExit(_charts(args))
+    elif args.command == "release":
+        manifest = build_release(DEFAULT_DATA, Path(__file__).resolve().parents[2] / "results")
+        print(json.dumps(manifest, indent=2, sort_keys=True))

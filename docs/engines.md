@@ -32,7 +32,8 @@ Biased-Decisions for references and licensing details.
 
 ## Laya
 
-- Package: `laya==0.3.20`.
+- Package: `laya==0.3.20`, `torch==2.8.0`, `torchvision==0.23.0`, and
+  `transformers==5.17.0` for the verified Apple Silicon runtime.
 - Model: `convaiinnovations/laya`, English classifier snapshot revision
   `55cf4c4ebb4ebe31b2550e8bdf3bd21b99753851`.
 - Set `LAYA_CHECKPOINT_PATH` to a local directory for that exact revision.

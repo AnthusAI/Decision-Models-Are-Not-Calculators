@@ -1,9 +1,13 @@
 from collections import Counter
+import asyncio
 from itertools import permutations
 
 import pytest
 
+from benford_decisions import collect
 from benford_decisions.engines import validate_answer
+from benford_decisions.records import read_jsonl
+from benford_decisions.release import build_release
 from benford_decisions.study import FACES, WORDS, Job, jobs, orders
 from benford_decisions.summary import summarize
 
@@ -47,7 +51,8 @@ def test_validate_rejects_missing_or_invalid_probability():
 def test_summary_detects_incomplete_engine():
     job = next(jobs("jev"))
     row = {"request_id": job.request_id, "engine": "jev", "representation": "digits",
-           "pass_number": 1, "choice_face": "1", "top_face": "1", "choice_position": 1,
+           "pass_number": 1, "permutation_rank": 1,
+           "choice_face": "1", "top_face": None, "choice_position": 1,
            "probabilities": {label: 1 / 6 for label in job.options},
            "probabilities_by_face": {face: 1 / 6 for face in FACES},
            "label_to_face": {label: str(index + 1) for index, label in enumerate(job.options)},
@@ -55,4 +60,27 @@ def test_summary_detects_incomplete_engine():
     result = summarize([row])["engines"]["jev"]
     assert result["successful"] == 1
     assert result["complete"] is False
-    assert result["strict_one_dominance"] is True
+    assert result["strict_one_dominance"] is False
+
+
+def test_collector_stops_after_first_adapter_failure(tmp_path, monkeypatch):
+    class BrokenAdapter:
+        async def provenance(self):
+            return {"engine": "kev", "revision": "test"}
+
+        async def answer(self, _job):
+            raise OSError("test endpoint unavailable")
+
+    monkeypatch.setattr(collect, "make_adapter", lambda _engine: BrokenAdapter())
+    result = asyncio.run(collect.run_engine("kev", tmp_path / "kev.jsonl"))
+    rows = read_jsonl(tmp_path / "kev.jsonl")
+    assert len(rows) == 1
+    assert rows[0]["status"] == "error"
+    assert result["successful"] == 0
+    assert result["complete"] is False
+
+
+def test_release_refuses_incomplete_results(tmp_path):
+    (tmp_path / "data").mkdir()
+    with pytest.raises(RuntimeError, match="jev is incomplete"):
+        build_release(tmp_path / "data", tmp_path / "results")

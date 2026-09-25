@@ -192,7 +192,14 @@ class LayaAdapter:
                 "checkpoint_path": str(self.checkpoint),
                 "device": self.device,
                 "torch": self._torch.__version__,
-                "mps_available": bool(self._torch.backends.mps.is_available())}
+                "torchvision": _version("torchvision"),
+                "transformers": _version("transformers"),
+                "mps_available": bool(self._torch.backends.mps.is_available()),
+                "checkpoint_warning": (
+                    "The checkpoint emits invalid temperatures for some option cardinalities; "
+                    "Laya clamps them to 0.5. Do not interpret its separate confidence score "
+                    "as calibrated for those entries. This study records choice probabilities."
+                )}
 
     async def answer(self, job: Job) -> tuple[dict, dict, float]:
         request = {"state": STATE, "model": "english",

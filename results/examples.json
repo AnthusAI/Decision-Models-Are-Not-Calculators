@@ -1,0 +1,454 @@
+[
+  {
+    "engine": "jev",
+    "normalized_choice_face": "1",
+    "normalized_probabilities_by_face": {
+      "1": 0.88,
+      "2": 0.01,
+      "3": 0.02,
+      "4": 0.05,
+      "5": 0.01,
+      "6": 0.03
+    },
+    "provenance": {
+      "engine": "jev",
+      "input_price_usd_per_million_tokens": 0.042,
+      "machine": "arm64",
+      "platform": "macOS-26.6.2-arm64-arm-64bit",
+      "pricing_source": "https://typesafe.ai/blog/introducing-system-one-models-and-jev",
+      "python": "3.12.2",
+      "requested_model": "jev-latest",
+      "typesafe_sdk": "0.7.1"
+    },
+    "representation": "digits",
+    "request": {
+      "model": "jev-latest",
+      "questions": {
+        "die_result": {
+          "criteria": {
+            "1": "the die face marked 1",
+            "2": "the die face marked 2",
+            "3": "the die face marked 3",
+            "4": "the die face marked 4",
+            "5": "the die face marked 5",
+            "6": "the die face marked 6"
+          },
+          "instructions": "Which face showed on the roll?",
+          "type": "choice"
+        }
+      },
+      "state": "A fair six-sided die was rolled once. The result is unknown."
+    },
+    "request_id": "jev:digits:pass-1:order-001",
+    "response": {
+      "answers": {
+        "die_result": {
+          "choice": "1",
+          "confidence": 0.85,
+          "probabilities": {
+            "1": 0.88,
+            "2": 0.01,
+            "3": 0.02,
+            "4": 0.05,
+            "5": 0.01,
+            "6": 0.03
+          },
+          "type": "choice"
+        }
+      },
+      "model": "jev-1.13.0",
+      "usage": {
+        "input_tokens": 399,
+        "output_tokens": 60
+      }
+    }
+  },
+  {
+    "engine": "jev",
+    "normalized_choice_face": "1",
+    "normalized_probabilities_by_face": {
+      "1": 0.85,
+      "2": 0.01,
+      "3": 0.03,
+      "4": 0.05,
+      "5": 0.01,
+      "6": 0.05
+    },
+    "provenance": {
+      "engine": "jev",
+      "input_price_usd_per_million_tokens": 0.042,
+      "machine": "arm64",
+      "platform": "macOS-26.6.2-arm64-arm-64bit",
+      "pricing_source": "https://typesafe.ai/blog/introducing-system-one-models-and-jev",
+      "python": "3.12.2",
+      "requested_model": "jev-latest",
+      "typesafe_sdk": "0.7.1"
+    },
+    "representation": "words",
+    "request": {
+      "model": "jev-latest",
+      "questions": {
+        "die_result": {
+          "criteria": {
+            "five": "the die face marked five",
+            "four": "the die face marked four",
+            "one": "the die face marked one",
+            "six": "the die face marked six",
+            "three": "the die face marked three",
+            "two": "the die face marked two"
+          },
+          "instructions": "Which face showed on the roll?",
+          "type": "choice"
+        }
+      },
+      "state": "A fair six-sided die was rolled once. The result is unknown."
+    },
+    "request_id": "jev:words:pass-1:order-001",
+    "response": {
+      "answers": {
+        "die_result": {
+          "choice": "one",
+          "confidence": 0.81,
+          "probabilities": {
+            "five": 0.01,
+            "four": 0.05,
+            "one": 0.85,
+            "six": 0.05,
+            "three": 0.03,
+            "two": 0.01
+          },
+          "type": "choice"
+        }
+      },
+      "model": "jev-1.13.0",
+      "usage": {
+        "input_tokens": 393,
+        "output_tokens": 60
+      }
+    }
+  },
+  {
+    "engine": "kev",
+    "normalized_choice_face": "6",
+    "normalized_probabilities_by_face": {
+      "1": 0.1734,
+      "2": 0.1172,
+      "3": 0.1687,
+      "4": 0.1623,
+      "5": 0.1809,
+      "6": 0.1975
+    },
+    "provenance": {
+      "api_key_required": false,
+      "base_revision": "dc7cdfe2ee4154fa7e30f5b51ca41bfa40174e68",
+      "engine": "kev",
+      "machine": "arm64",
+      "platform": "macOS-26.6.2-arm64-arm-64bit",
+      "python": "3.12.2",
+      "server_model": {
+        "backend": "mlx",
+        "base": "Qwen/Qwen3.5-0.8B-Base",
+        "cuda_graphs": null,
+        "description": "Kev pointer head on Qwen/Qwen3.5-0.8B-Base, serving jaredpalmer/kev-0.8b@54f4f8777356cd5bbbb6c6919c657f26e6f2f6d8 at temperature 2.41",
+        "device": "mps",
+        "dtype": "bfloat16",
+        "lora": 16,
+        "name": "kev-latest",
+        "prefix_cache": {
+          "cached_states": 0,
+          "hits": 0,
+          "min_state_tokens": 0,
+          "misses": 0,
+          "size": 0
+        },
+        "release_date": "2026-09-23",
+        "run": "jaredpalmer/kev-0.8b@54f4f8777356cd5bbbb6c6919c657f26e6f2f6d8",
+        "temperature": 2.406050072164233
+      },
+      "server_revision": "c9c1f855505336ac32092a5f68305d397f7fcc3e"
+    },
+    "representation": "digits",
+    "request": {
+      "model": "kev-latest",
+      "questions": {
+        "die_result": {
+          "criteria": {
+            "1": "the die face marked 1",
+            "2": "the die face marked 2",
+            "3": "the die face marked 3",
+            "4": "the die face marked 4",
+            "5": "the die face marked 5",
+            "6": "the die face marked 6"
+          },
+          "instructions": "Which face showed on the roll?",
+          "type": "choice"
+        }
+      },
+      "state": "A fair six-sided die was rolled once. The result is unknown."
+    },
+    "request_id": "kev:digits:pass-1:order-001",
+    "response": {
+      "answers": {
+        "die_result": {
+          "choice": "6",
+          "confidence": 0.037,
+          "probabilities": {
+            "1": 0.1734,
+            "2": 0.1172,
+            "3": 0.1687,
+            "4": 0.1623,
+            "5": 0.1809,
+            "6": 0.1975
+          },
+          "type": "choice"
+        }
+      },
+      "latency_ms": 130.5,
+      "model": "kev-latest",
+      "usage": {
+        "input_tokens": 84,
+        "output_tokens": 96
+      }
+    }
+  },
+  {
+    "engine": "kev",
+    "normalized_choice_face": "1",
+    "normalized_probabilities_by_face": {
+      "1": 0.2461,
+      "2": 0.1455,
+      "3": 0.1482,
+      "4": 0.1306,
+      "5": 0.1527,
+      "6": 0.1768
+    },
+    "provenance": {
+      "api_key_required": false,
+      "base_revision": "dc7cdfe2ee4154fa7e30f5b51ca41bfa40174e68",
+      "engine": "kev",
+      "machine": "arm64",
+      "platform": "macOS-26.6.2-arm64-arm-64bit",
+      "python": "3.12.2",
+      "server_model": {
+        "backend": "mlx",
+        "base": "Qwen/Qwen3.5-0.8B-Base",
+        "cuda_graphs": null,
+        "description": "Kev pointer head on Qwen/Qwen3.5-0.8B-Base, serving jaredpalmer/kev-0.8b@54f4f8777356cd5bbbb6c6919c657f26e6f2f6d8 at temperature 2.41",
+        "device": "mps",
+        "dtype": "bfloat16",
+        "lora": 16,
+        "name": "kev-latest",
+        "prefix_cache": {
+          "cached_states": 0,
+          "hits": 0,
+          "min_state_tokens": 0,
+          "misses": 0,
+          "size": 0
+        },
+        "release_date": "2026-09-23",
+        "run": "jaredpalmer/kev-0.8b@54f4f8777356cd5bbbb6c6919c657f26e6f2f6d8",
+        "temperature": 2.406050072164233
+      },
+      "server_revision": "c9c1f855505336ac32092a5f68305d397f7fcc3e"
+    },
+    "representation": "words",
+    "request": {
+      "model": "kev-latest",
+      "questions": {
+        "die_result": {
+          "criteria": {
+            "five": "the die face marked five",
+            "four": "the die face marked four",
+            "one": "the die face marked one",
+            "six": "the die face marked six",
+            "three": "the die face marked three",
+            "two": "the die face marked two"
+          },
+          "instructions": "Which face showed on the roll?",
+          "type": "choice"
+        }
+      },
+      "state": "A fair six-sided die was rolled once. The result is unknown."
+    },
+    "request_id": "kev:words:pass-1:order-001",
+    "response": {
+      "answers": {
+        "die_result": {
+          "choice": "one",
+          "confidence": 0.0953,
+          "probabilities": {
+            "five": 0.1527,
+            "four": 0.1306,
+            "one": 0.2461,
+            "six": 0.1768,
+            "three": 0.1482,
+            "two": 0.1455
+          },
+          "type": "choice"
+        }
+      },
+      "latency_ms": 61.8,
+      "model": "kev-latest",
+      "usage": {
+        "input_tokens": 78,
+        "output_tokens": 97
+      }
+    }
+  },
+  {
+    "engine": "laya",
+    "normalized_choice_face": "1",
+    "normalized_probabilities_by_face": {
+      "1": 0.3988,
+      "2": 0.2483,
+      "3": 0.1496,
+      "4": 0.0723,
+      "5": 0.0531,
+      "6": 0.078
+    },
+    "provenance": {
+      "checkpoint": "convaiinnovations/laya",
+      "checkpoint_path": "/Users/home/.cache/huggingface/hub/models--convaiinnovations--laya/snapshots/55cf4c4ebb4ebe31b2550e8bdf3bd21b99753851",
+      "checkpoint_revision": "55cf4c4ebb4ebe31b2550e8bdf3bd21b99753851",
+      "device": "mps",
+      "engine": "laya",
+      "machine": "arm64",
+      "mps_available": true,
+      "package_version": "0.3.20",
+      "platform": "macOS-26.6.2-arm64-arm-64bit",
+      "python": "3.12.2",
+      "torch": "2.8.0"
+    },
+    "representation": "digits",
+    "request": {
+      "model": "english",
+      "questions": {
+        "die_result": {
+          "criteria": {
+            "1": "the die face marked 1",
+            "2": "the die face marked 2",
+            "3": "the die face marked 3",
+            "4": "the die face marked 4",
+            "5": "the die face marked 5",
+            "6": "the die face marked 6"
+          },
+          "instructions": "Which face showed on the roll?",
+          "type": "choice"
+        }
+      },
+      "state": "A fair six-sided die was rolled once. The result is unknown."
+    },
+    "request_id": "laya:digits:pass-1:order-001",
+    "response": {
+      "answers": {
+        "die_result": {
+          "action": {
+            "act_probability": 1.0
+          },
+          "answer_confidence": 0.3988,
+          "choice": "1",
+          "confidence": 0.1397,
+          "probabilities": {
+            "1": 0.3988,
+            "2": 0.2483,
+            "3": 0.1496,
+            "4": 0.0723,
+            "5": 0.0531,
+            "6": 0.078
+          },
+          "type": "choice"
+        }
+      },
+      "model": "laya-rl-agent",
+      "routing": {
+        "detection": null,
+        "model": "english",
+        "reason": "explicit model='english'",
+        "repo": "/Users/home/.cache/huggingface/hub/models--convaiinnovations--laya/snapshots/55cf4c4ebb4ebe31b2550e8bdf3bd21b99753851",
+        "workflow": null
+      },
+      "usage": {
+        "input_tokens": 77,
+        "output_tokens": 0
+      }
+    }
+  },
+  {
+    "engine": "laya",
+    "normalized_choice_face": "1",
+    "normalized_probabilities_by_face": {
+      "1": 0.4298,
+      "2": 0.1087,
+      "3": 0.0701,
+      "4": 0.034,
+      "5": 0.0265,
+      "6": 0.3309
+    },
+    "provenance": {
+      "checkpoint": "convaiinnovations/laya",
+      "checkpoint_path": "/Users/home/.cache/huggingface/hub/models--convaiinnovations--laya/snapshots/55cf4c4ebb4ebe31b2550e8bdf3bd21b99753851",
+      "checkpoint_revision": "55cf4c4ebb4ebe31b2550e8bdf3bd21b99753851",
+      "device": "mps",
+      "engine": "laya",
+      "machine": "arm64",
+      "mps_available": true,
+      "package_version": "0.3.20",
+      "platform": "macOS-26.6.2-arm64-arm-64bit",
+      "python": "3.12.2",
+      "torch": "2.8.0"
+    },
+    "representation": "words",
+    "request": {
+      "model": "english",
+      "questions": {
+        "die_result": {
+          "criteria": {
+            "five": "the die face marked five",
+            "four": "the die face marked four",
+            "one": "the die face marked one",
+            "six": "the die face marked six",
+            "three": "the die face marked three",
+            "two": "the die face marked two"
+          },
+          "instructions": "Which face showed on the roll?",
+          "type": "choice"
+        }
+      },
+      "state": "A fair six-sided die was rolled once. The result is unknown."
+    },
+    "request_id": "laya:words:pass-1:order-001",
+    "response": {
+      "answers": {
+        "die_result": {
+          "action": {
+            "act_probability": 1.0
+          },
+          "answer_confidence": 0.4298,
+          "choice": "one",
+          "confidence": 0.2368,
+          "probabilities": {
+            "five": 0.0265,
+            "four": 0.034,
+            "one": 0.4298,
+            "six": 0.3309,
+            "three": 0.0701,
+            "two": 0.1087
+          },
+          "type": "choice"
+        }
+      },
+      "model": "laya-rl-agent",
+      "routing": {
+        "detection": null,
+        "model": "english",
+        "reason": "explicit model='english'",
+        "repo": "/Users/home/.cache/huggingface/hub/models--convaiinnovations--laya/snapshots/55cf4c4ebb4ebe31b2550e8bdf3bd21b99753851",
+        "workflow": null
+      },
+      "usage": {
+        "input_tokens": 77,
+        "output_tokens": 0
+      }
+    }
+  }
+]

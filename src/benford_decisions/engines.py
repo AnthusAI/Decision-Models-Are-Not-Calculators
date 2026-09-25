@@ -81,7 +81,7 @@ class JevAdapter:
             from typesafe_sdk import AsyncTypeSafeClient
             from typesafe_sdk import Choice
         except ImportError as error:
-            raise RuntimeError("install benford-decisions[jev] before using Jev") from error
+            raise RuntimeError("install decision-models-are-not-calculators[jev] before using Jev") from error
         self._client = AsyncTypeSafeClient()
         self._choice_type = Choice
 
@@ -184,7 +184,7 @@ class LayaAdapter:
             import torch
             from laya import Router
         except ImportError as error:
-            raise RuntimeError("install benford-decisions[laya] and PyTorch before using Laya") from error
+            raise RuntimeError("install decision-models-are-not-calculators[laya] and PyTorch before using Laya") from error
         self._torch = torch
         device = os.environ.get("LAYA_DEVICE", "mps" if platform.system() == "Darwin" else "cpu")
         self.device = device
@@ -236,7 +236,11 @@ def validate_answer(job: Job, answer: dict) -> dict[str, float]:
         if not 0 <= float(value) <= 1:
             raise ValueError(f"probability for {option!r} is outside [0, 1]")
         normalized[option] = float(value)
-    if abs(sum(normalized.values()) - 1.0) > max(0.00031, len(job.options) * 0.0000501):
+    # Hosted Jev reports probabilities to two decimal places. Six independently
+    # rounded values may miss 1 by up to 6 * 0.005; retain the raw values.
+    tolerance = (len(job.options) * 0.005 + 1e-9 if job.engine == "jev"
+                 else max(0.00031, len(job.options) * 0.0000501))
+    if abs(sum(normalized.values()) - 1.0) > tolerance:
         raise ValueError("choice probabilities do not sum to one")
     if answer.get("choice") not in job.options:
         raise ValueError("selected choice is absent from the requested options")

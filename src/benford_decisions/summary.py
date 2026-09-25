@@ -20,6 +20,24 @@ def summarize(rows: Iterable[dict]) -> dict:
         order_counts = Counter(row["choice_face"] for row in engine_rows)
         subsets = {}
         repeat_by_representation = {}
+        representation_comparison = {}
+        for pass_number in (1, 2):
+            digits = {row["permutation_rank"]: row for row in engine_rows
+                      if row["representation"] == "digits" and row["pass_number"] == pass_number}
+            words = {row["permutation_rank"]: row for row in engine_rows
+                     if row["representation"] == "words" and row["pass_number"] == pass_number}
+            paired = sorted(digits.keys() & words.keys())
+            representation_comparison[f"pass_{pass_number}"] = {
+                "paired_orders": len(paired),
+                "changed_selected_face": sum(
+                    digits[rank]["choice_face"] != words[rank]["choice_face"] for rank in paired),
+                "mean_absolute_probability_change_by_face": {
+                    face: (sum(abs(digits[rank]["probabilities_by_face"][face] -
+                                   words[rank]["probabilities_by_face"][face]) for rank in paired)
+                           / len(paired) if paired else None)
+                    for face in FACES
+                },
+            }
         for representation in ("digits", "words"):
             first = {row["permutation_rank"]: row for row in engine_rows
                      if row["representation"] == representation and row["pass_number"] == 1}
@@ -54,6 +72,12 @@ def summarize(rows: Iterable[dict]) -> dict:
                     face: sum(row["probabilities_by_face"][face] for row in part) / len(part)
                     if part else None for face in FACES
                 }
+                position_means = {
+                    str(position): (
+                        sum(row["probabilities"][row["options"][position - 1]]
+                            for row in part) / len(part) if part else None
+                    ) for position in range(1, 7)
+                }
                 subsets[f"{representation}_pass_{pass_number}"] = {
                     "n": len(part),
                     "top_choice_count_by_face": {face: top[face] for face in FACES},
@@ -62,8 +86,10 @@ def summarize(rows: Iterable[dict]) -> dict:
                         str(position): pos_chosen[position] for position in range(1, 7)
                     },
                     "mean_probability_by_face": face_means,
+                    "mean_probability_by_position": position_means,
                     "selection_range_by_position": (
-                        max(pos_chosen.values(), default=0) - min(pos_chosen.values(), default=0)
+                        max(pos_chosen[position] for position in range(1, 7)) -
+                        min(pos_chosen[position] for position in range(1, 7))
                     ),
                 }
         by_engine[engine] = {
@@ -74,6 +100,7 @@ def summarize(rows: Iterable[dict]) -> dict:
             "choice_count_by_face": {face: order_counts[face] for face in FACES},
             "subsets": subsets,
             "repeat_stability": repeat_by_representation,
+            "representation_comparison": representation_comparison,
             "strict_one_dominance": all(
                 row["top_face"] == "1" for row in engine_rows if row["representation"] == "digits"
             ) if engine_rows else False,

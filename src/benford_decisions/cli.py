@@ -54,14 +54,15 @@ def _summary(args) -> int:
     return 0 if all(result["engines"][name]["complete"] for name in engines) else 2
 
 
-def _charts(_args) -> int:
+def _charts(args) -> int:
     from .charts import generate
-    generate(DEFAULT_DATA, Path(__file__).resolve().parents[2] / "images")
+    generate(DEFAULT_DATA, Path(__file__).resolve().parents[2] / "images",
+             allow_incomplete=args.allow_incomplete)
     return 0
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(prog="benford-decisions")
+    parser = argparse.ArgumentParser(prog="decision-models")
     commands = parser.add_subparsers(dest="command", required=True)
     commands.add_parser("plan", help="show the frozen matrix and cost estimate")
     preflight = commands.add_parser("preflight", help="verify one engine before inference")
@@ -72,8 +73,10 @@ def main() -> None:
     summary = commands.add_parser("summarize", help="summarize successful recorded responses")
     summary.add_argument("--engine", choices=(*ENGINE_NAMES, "all"), default="all")
     summary.add_argument("--output", type=Path)
-    commands.add_parser("charts", help="generate the social image and result plots")
-    commands.add_parser("release", help="validate all runs and export checksummed responses")
+    charts = commands.add_parser("charts", help="generate the social image and result plots")
+    charts.add_argument("--allow-incomplete", action="store_true")
+    release = commands.add_parser("release", help="validate runs and export checksummed responses")
+    release.add_argument("--allow-incomplete", action="store_true")
     args = parser.parse_args()
     if args.command == "plan":
         output = {engine: {"requests": len(list(jobs(engine))),
@@ -92,5 +95,6 @@ def main() -> None:
     elif args.command == "charts":
         raise SystemExit(_charts(args))
     elif args.command == "release":
-        manifest = build_release(DEFAULT_DATA, Path(__file__).resolve().parents[2] / "results")
+        manifest = build_release(DEFAULT_DATA, Path(__file__).resolve().parents[2] / "results",
+                                 allow_incomplete=args.allow_incomplete)
         print(json.dumps(manifest, indent=2, sort_keys=True))

@@ -55,10 +55,23 @@ def test_validate_rejects_missing_or_invalid_probability():
         validate_answer(job, {"type": "choice", "choice": "1", "probabilities": {"1": 1}})
 
 
+def test_jev_two_decimal_rounding_is_retained_without_renormalizing():
+    jev_job = next(jobs("jev"))
+    probabilities = {"1": .93, "2": .02, "3": .01, "4": .01, "5": .0, "6": .02}
+    result = validate_answer(jev_job, {"type": "choice", "choice": "1",
+                                       "probabilities": probabilities})
+    assert sum(result.values()) == pytest.approx(.99)
+    kev_job = next(jobs("kev"))
+    with pytest.raises(ValueError, match="sum to one"):
+        validate_answer(kev_job, {"type": "choice", "choice": "1",
+                                  "probabilities": probabilities})
+
+
 def test_summary_detects_incomplete_engine():
     job = next(jobs("jev"))
     row = {"request_id": job.request_id, "engine": "jev", "representation": "digits",
            "pass_number": 1, "permutation_rank": 1,
+           "options": list(job.options),
            "choice_face": "1", "top_face": None, "choice_position": 1,
            "probabilities": {label: 1 / 6 for label in job.options},
            "probabilities_by_face": {face: 1 / 6 for face in FACES},

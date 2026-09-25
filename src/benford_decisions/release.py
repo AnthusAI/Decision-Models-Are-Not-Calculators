@@ -22,9 +22,11 @@ def _canonical(row: dict) -> bytes:
                       allow_nan=False).encode("utf-8")
 
 
-def build_release(data_dir: Path, results_dir: Path) -> dict:
+def build_release(data_dir: Path, results_dir: Path, allow_incomplete: bool = False) -> dict:
     rows_by_engine: dict[str, list[dict]] = {}
     release_files: dict[str, dict] = {}
+    engine_provenance: dict[str, dict] = {}
+    response_model_ids: dict[str, list[str]] = {}
     examples = []
     environment = {"python": platform.python_version(), "platform": platform.platform(),
                    "machine": platform.machine(), "benford_decisions": "0.1.0"}
@@ -47,6 +49,8 @@ def build_release(data_dir: Path, results_dir: Path) -> dict:
         planned = {job.request_id: job for job in jobs(engine)}
         expected = complete_request_ids(engine)
         if set(by_id) != expected:
+            if allow_incomplete and not by_id:
+                continue
             raise RuntimeError(f"{engine} is incomplete: {len(by_id)}/{len(expected)} valid responses")
         ordered_rows = [by_id[request_id] for request_id in planned]
         for row in ordered_rows:
@@ -88,6 +92,12 @@ def build_release(data_dir: Path, results_dir: Path) -> dict:
         provenance = {json.dumps(row["provenance"], sort_keys=True) for row in ordered_rows}
         if len(provenance) != 1:
             raise ValueError(f"{engine} model/environment provenance changed mid-run")
+        engine_provenance[engine] = ordered_rows[0]["provenance"]
+        response_model_ids[engine] = sorted({
+            str(row["raw_response"].get("model") or
+                row["raw_response"].get("response", {}).get("model"))
+            for row in ordered_rows
+        })
         rows_by_engine[engine] = ordered_rows
 
         target = data_dir / f"{engine}-responses.jsonl.gz"
@@ -131,7 +141,13 @@ def build_release(data_dir: Path, results_dir: Path) -> dict:
                 "created_at": datetime.now(timezone.utc).isoformat(),
                 "expected_total_responses": 8640,
                 "successful_total_responses": sum(len(rows) for rows in rows_by_engine.values()),
-                "environment": environment, "archives": release_files}
+                "complete": len(rows_by_engine) == len(ENGINE_NAMES),
+                "completed_engines": sorted(rows_by_engine),
+                "incomplete_engines": [engine for engine in ENGINE_NAMES if engine not in rows_by_engine],
+                "release_generator_environment": environment,
+                "engine_provenance": engine_provenance,
+                "response_model_ids": response_model_ids,
+                "archives": release_files}
     (results_dir / "release-manifest.json").write_text(
         json.dumps(manifest, indent=2, sort_keys=True, allow_nan=False) + "\n", encoding="utf-8")
     return manifest

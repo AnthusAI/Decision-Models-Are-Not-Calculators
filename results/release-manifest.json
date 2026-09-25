@@ -1,0 +1,112 @@
+{
+  "archives": {
+    "jev-responses.jsonl.gz": {
+      "compressed_bytes": 146573,
+      "failed_attempts_excluded": 3,
+      "records": 2880,
+      "sha256": "0f22619da424f7efca9ac4a50ed6ca3a457084147ba82a09ca694fb30f5068a4"
+    },
+    "kev-responses.jsonl.gz": {
+      "compressed_bytes": 251968,
+      "failed_attempts_excluded": 0,
+      "records": 2880,
+      "sha256": "df9506e000295a29fe144b47d367327d8222c509ecf4a70c962a7ee32e251c61"
+    },
+    "laya-responses.jsonl.gz": {
+      "compressed_bytes": 250727,
+      "failed_attempts_excluded": 2880,
+      "records": 2880,
+      "sha256": "2155beeb055f16df2344178b83bb4d35835cd1f90a6d938d4f5313d0604acb33"
+    }
+  },
+  "complete": true,
+  "completed_engines": [
+    "jev",
+    "kev",
+    "laya"
+  ],
+  "created_at": "2026-09-25T16:22:44.602689+00:00",
+  "engine_provenance": {
+    "jev": {
+      "engine": "jev",
+      "input_price_usd_per_million_tokens": 0.042,
+      "machine": "arm64",
+      "platform": "macOS-26.6.2-arm64-arm-64bit",
+      "pricing_source": "https://typesafe.ai/blog/introducing-system-one-models-and-jev",
+      "python": "3.12.2",
+      "requested_model": "jev-latest",
+      "typesafe_sdk": "0.7.1"
+    },
+    "kev": {
+      "api_key_required": false,
+      "base_revision": "dc7cdfe2ee4154fa7e30f5b51ca41bfa40174e68",
+      "engine": "kev",
+      "machine": "arm64",
+      "platform": "macOS-26.6.2-arm64-arm-64bit",
+      "python": "3.12.2",
+      "server_model": {
+        "backend": "mlx",
+        "base": "Qwen/Qwen3.5-0.8B-Base",
+        "cuda_graphs": null,
+        "description": "Kev pointer head on Qwen/Qwen3.5-0.8B-Base, serving jaredpalmer/kev-0.8b@54f4f8777356cd5bbbb6c6919c657f26e6f2f6d8 at temperature 2.41",
+        "device": "mps",
+        "dtype": "bfloat16",
+        "lora": 16,
+        "name": "kev-latest",
+        "prefix_cache": {
+          "cached_states": 0,
+          "hits": 0,
+          "min_state_tokens": 0,
+          "misses": 0,
+          "size": 0
+        },
+        "release_date": "2026-09-23",
+        "run": "jaredpalmer/kev-0.8b@54f4f8777356cd5bbbb6c6919c657f26e6f2f6d8",
+        "temperature": 2.406050072164233
+      },
+      "server_revision": "c9c1f855505336ac32092a5f68305d397f7fcc3e"
+    },
+    "laya": {
+      "checkpoint": "convaiinnovations/laya",
+      "checkpoint_path": "/Users/home/.cache/huggingface/hub/models--convaiinnovations--laya/snapshots/55cf4c4ebb4ebe31b2550e8bdf3bd21b99753851",
+      "checkpoint_revision": "55cf4c4ebb4ebe31b2550e8bdf3bd21b99753851",
+      "device": "mps",
+      "engine": "laya",
+      "machine": "arm64",
+      "mps_available": true,
+      "package_version": "0.3.20",
+      "platform": "macOS-26.6.2-arm64-arm-64bit",
+      "python": "3.12.2",
+      "torch": "2.8.0"
+    }
+  },
+  "expected_total_responses": 8640,
+  "incomplete_engines": [],
+  "release_generator_environment": {
+    "benford_decisions": "0.1.0",
+    "huggingface-hub": "1.16.1",
+    "laya": "0.3.20",
+    "machine": "arm64",
+    "matplotlib": "3.9.2",
+    "numpy": "1.26.4",
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "python": "3.12.2",
+    "torch": "2.8.0",
+    "torchvision": "0.23.0",
+    "transformers": "5.17.0",
+    "typesafe-sdk": "0.7.1"
+  },
+  "response_model_ids": {
+    "jev": [
+      "jev-1.13.0"
+    ],
+    "kev": [
+      "kev-latest"
+    ],
+    "laya": [
+      "laya-rl-agent"
+    ]
+  },
+  "study_id": "fair-die-option-order-v1",
+  "successful_total_responses": 8640
+}

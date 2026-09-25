@@ -52,6 +52,8 @@ async def run_engine(engine: str, output: Path, cap: float = DEFAULT_CAP) -> dic
         started = time.perf_counter()
         try:
             raw, answer, latency_ms = await adapter.answer(job)
+            # Retain a malformed model reply in the error record for audit.
+            record["raw_response"] = raw
             probs = validate_answer(job, answer)
             label_to_face = {label: job.face_for_label(label) for label in job.options}
             max_probability = max(probs.values())
@@ -66,7 +68,7 @@ async def run_engine(engine: str, output: Path, cap: float = DEFAULT_CAP) -> dic
                            "label_to_face": label_to_face,
                            "option_position": {label: i + 1 for i, label in enumerate(job.options)},
                            "choice_position": job.options.index(answer["choice"]) + 1,
-                           "latency_ms": round(latency_ms, 3), "raw_response": raw,
+                           "latency_ms": round(latency_ms, 3),
                            "completed_at": datetime.now(timezone.utc).isoformat()})
             usage = raw.get("usage", {}) if isinstance(raw, dict) else {}
             input_tokens = usage.get("input_tokens", usage.get("prompt_tokens"))

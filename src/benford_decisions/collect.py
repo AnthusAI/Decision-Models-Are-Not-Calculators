@@ -11,7 +11,7 @@ import time
 from datetime import datetime, timezone
 from pathlib import Path
 
-from .engines import JEV_INPUT_USD_PER_MILLION, make_adapter, validate_answer
+from .engines import JEV_INPUT_USD_PER_MILLION, make_adapter, request_payload, validate_answer
 from .records import append_jsonl, read_jsonl
 from .study import ENGINE_NAMES, FACES, jobs
 from .summary import summarize
@@ -47,7 +47,7 @@ async def run_engine(engine: str, output: Path, cap: float = DEFAULT_CAP) -> dic
         record = {"study_id": "fair-die-option-order-v1", "request_id": job.request_id,
                   "engine": engine, "representation": job.representation,
                   "pass_number": job.pass_number, "permutation_rank": job.permutation_rank,
-                  "options": list(job.options), "request": job.request(),
+                  "options": list(job.options), "request": request_payload(engine, job),
                   "provenance": provenance, "started_at": datetime.now(timezone.utc).isoformat()}
         started = time.perf_counter()
         try:

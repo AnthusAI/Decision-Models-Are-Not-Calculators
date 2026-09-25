@@ -24,6 +24,15 @@ LAYA_PACKAGE_VERSION = "0.3.20"
 LAYA_CHECKPOINT_REVISION = "55cf4c4ebb4ebe31b2550e8bdf3bd21b99753851"
 
 
+def request_payload(engine: str, job: Job) -> dict:
+    """Return the exact non-secret logical request envelope sent to an engine."""
+    model = {"jev": JEV_MODEL, "kev": KEV_MODEL, "laya": "english"}.get(engine)
+    if model is None:
+        raise ValueError(f"unknown engine: {engine}")
+    return {"state": STATE, "model": model,
+            "questions": {QUESTION_NAME: job.question()}}
+
+
 def jsonable(value: Any) -> Any:
     if hasattr(value, "model_dump"):
         return value.model_dump(mode="json", exclude_none=True)
@@ -143,8 +152,7 @@ class KevAdapter:
                 "api_key_required": bool(self.api_key)}
 
     async def answer(self, job: Job) -> tuple[dict, dict, float]:
-        payload = {"state": STATE, "model": self.model,
-                   "questions": {QUESTION_NAME: job.question()}}
+        payload = request_payload("kev", job)
         request = Request(self.base_url + "/v1/systemone",
                           data=json.dumps(payload).encode("utf-8"),
                           headers=self._headers, method="POST")
@@ -202,8 +210,7 @@ class LayaAdapter:
                 )}
 
     async def answer(self, job: Job) -> tuple[dict, dict, float]:
-        request = {"state": STATE, "model": "english",
-                   "questions": {QUESTION_NAME: job.question()}}
+        request = request_payload("laya", job)
         started = time.perf_counter()
         response = await asyncio.to_thread(
             self._router.predict, STATE, request["questions"], model="english")

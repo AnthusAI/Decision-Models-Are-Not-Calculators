@@ -12,7 +12,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from .records import read_jsonl
-from .engines import validate_answer
+from .engines import request_payload, validate_answer
 from .study import ENGINE_NAMES, REPRESENTATIONS, complete_request_ids, jobs
 from .summary import summarize
 
@@ -51,8 +51,13 @@ def build_release(data_dir: Path, results_dir: Path) -> dict:
         ordered_rows = [by_id[request_id] for request_id in planned]
         for row in ordered_rows:
             matching = planned[row["request_id"]]
-            if row["request"] != matching.request() or row["options"] != list(matching.options):
+            logical_request = request_payload(engine, matching)
+            # Earlier collector commits stored state/questions separately from
+            # the SDK's model argument. Normalize those records in the clean
+            # archive; model identity is independently pinned in provenance.
+            if row["request"] not in (logical_request, matching.request()) or row["options"] != list(matching.options):
                 raise ValueError(f"request differs from frozen protocol: {row['request_id']}")
+            row["request"] = logical_request
             normalized = validate_answer(matching, {
                 "type": "choice", "choice": row["choice_label"],
                 "probabilities": row["probabilities"],

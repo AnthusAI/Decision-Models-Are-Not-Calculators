@@ -5,7 +5,7 @@ from itertools import permutations
 import pytest
 
 from benford_decisions import collect
-from benford_decisions.engines import validate_answer
+from benford_decisions.engines import request_payload, validate_answer
 from benford_decisions.records import read_jsonl
 from benford_decisions.release import build_release
 from benford_decisions.study import FACES, WORDS, Job, jobs, orders
@@ -40,6 +40,13 @@ def test_prompt_does_not_cue_a_face_and_preserves_order():
     assert list(question["criteria"]) == list(job.options)
     assert "Benford" not in str(job.request())
     assert "probability" not in str(job.request()).lower()
+
+
+def test_engine_request_envelope_includes_model_and_exact_order():
+    job = Job("kev", "digits", 1, 1, ("6", "4", "2", "5", "3", "1"))
+    payload = request_payload("kev", job)
+    assert payload["model"] == "kev-latest"
+    assert list(payload["questions"]["die_result"]["criteria"]) == list(job.options)
 
 
 def test_validate_rejects_missing_or_invalid_probability():

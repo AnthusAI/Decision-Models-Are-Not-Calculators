@@ -1,78 +1,162 @@
 # Decision Models Are Not Calculators
 
-An exhaustive, replayable test of how Jev, Kev, and Laya assign probabilities to
-a fair six-sided die when the six choice labels are reordered.
+Someone rolls a fair six-sided die where nobody can see it. We know it landed
+on a face, but not which one. Each face still has a one-in-six chance. What
+happens if we ask a decision model to name the face anyway?
 
-The study tests all 720 orders with digit labels and all 720 with word labels,
-then repeats the full set once. Each model receives 2,880 requests. The test
-measures what these pinned models return for this prompt. It does not identify
-what data or training process caused the answers.
+We asked three. **Jev chose one every time. Kev chose one about half the time.
+Laya mostly chose six.** The models returned well-formed answers and
+probabilities, but they had no information about the roll. This is a study of
+their responses to a question, not a way to discover what happened behind the
+screen.
 
-## Results (25 September 2026)
+![Response-derived comparison of die-face probabilities: Jev favors one, Kev is comparatively flat, and Laya favors six](images/decision-models-are-not-calculators-cover.png)
 
-All **8,640 planned requests** returned valid responses: 720 choice orders ×
-two label forms × two passes × three models. The literal “always one” claim
-held for **Jev**, which selected face 1 in all 2,880 replies. It failed for
-**Kev**, which selected face 1 in 1,410/2,880 replies (49.0%), and for
-**Laya**, which selected face 6 in 2,610/2,880 replies (90.6%).
+The question grew out of [The Dominance of Ones](https://anth.us/blog/the-dominance-of-ones/),
+an article about Benford's Law. In many numerical datasets, one appears as a
+*leading digit* more often than the other digits. Could a related imbalance in
+training data make a model favor one when it has to choose a die face? That is
+an interesting hypothesis. The three models give us a useful test of the
+prediction, but not a test of its proposed cause.
 
-| Model | Selected face 1 | Selected face 6 | Digit-pass-1 mean probability for face 1 | Digit-pass-1 mean probability for face 6 |
+## One roll, three answers
+
+The state said, "A fair six-sided die was rolled once. The result is unknown."
+The question asked, "Which face showed on the roll?" The alternatives were the
+six marked faces. Here is one [actual digit-labelled request](results/examples.json),
+shown with Jev's model identifier. Kev received the same envelope with
+`"model": "kev-latest"`; Laya's field was `"model": "english"`.
+
+```json
+{
+  "model": "jev-latest",
+  "state": "A fair six-sided die was rolled once. The result is unknown.",
+  "questions": {
+    "die_result": {
+      "type": "choice",
+      "instructions": "Which face showed on the roll?",
+      "criteria": {
+        "1": "the die face marked 1",
+        "2": "the die face marked 2",
+        "3": "the die face marked 3",
+        "4": "the die face marked 4",
+        "5": "the die face marked 5",
+        "6": "the die face marked 6"
+      }
+    }
+  }
+}
+```
+
+For that exact order, these are the selected choices and returned per-face
+probabilities. The [example file](results/examples.json) retains the complete,
+unedited request and response envelopes. These are the models' reported choice
+probabilities, not calibrated probabilities that a guess is correct.
+
+| Model | Selected face | P(1) | P(2) | P(3) | P(4) | P(5) | P(6) |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Jev | 1 | .88 | .01 | .02 | .05 | .01 | .03 |
+| Kev | 6 | .1734 | .1172 | .1687 | .1623 | .1809 | .1975 |
+| Laya | 1 | .3988 | .2483 | .1496 | .0723 | .0531 | .0780 |
+
+Laya chose one in this example, yet six was its overwhelming favorite across
+the full experiment. One screenshot of one response would have told the wrong
+story.
+
+## Every order of the choices
+
+Six alternatives have **720 possible orders**. We tested every order with
+digit labels (`1` through `6`), then with word labels (`one` through `six`),
+and repeated both sets. That made 2,880 requests per model and **8,640 valid
+responses** in all. The [preregistered protocol](docs/PREREGISTERED.md) fixed
+the matrix before the runs. Within each label form and pass, every face
+appeared at every list position exactly 120 times.
+
+The [released summary](results/summary.json) gives the main result:
+
+| Model | Face 1 selected, all 2,880 replies | Face 6 selected, all 2,880 replies | Mean P(1), digit pass 1 | Mean P(6), digit pass 1 |
 | --- | ---: | ---: | ---: | ---: |
-| Jev | 2,880 / 2,880 | 0 | 89.7% | 4.4% |
-| Kev | 1,410 / 2,880 | 294 / 2,880 | 18.6% | 18.4% |
-| Laya | 40 / 2,880 | 2,610 / 2,880 | 6.5% | 66.2% |
+| Jev | 2,880 (100%) | 0 | 89.7% | 4.4% |
+| Kev | 1,410 (49.0%) | 294 | 18.6% | 18.4% |
+| Laya | 40 | 2,610 (90.6%) | 6.5% | 66.2% |
 
-Changing choice order mattered for Kev and Laya, although every face occupied
-every position exactly 120 times in each representation/pass. In the first
-digit pass, Kev selected the **first-listed option** 426/720 times (59.2%);
-Laya selected the **last-listed option** 0/720 times. Jev always selected
-face 1, so its selected position was perfectly balanced: 120/720 at each
-position. Changing digits to words changed the selected face for 324 of 720
-paired orders in Kev, 129 in Laya, and none in Jev. Exact repeats selected
-the same face in every case for all three models; Jev's returned probabilities
-varied slightly, while Kev's and Laya's were identical.
+Jev made one the unique highest-probability face in every digit-labelled
+request, as well as selecting it in every word-labelled request. Kev's mean
+digit probabilities were comparatively close to the fair-die baseline of
+16.7% per face, although its *selected answers* still favored one. In the
+first pass, Kev selected one in 219 digit-labelled orders and 486 word-labelled
+orders. A fairly flat average probability distribution does not guarantee
+evenly distributed selections: each selection is made from the probabilities
+for one particular order. Laya strongly favored six, selecting it in 589
+digit-labelled and 716 word-labelled orders in the first pass. Its mean
+P(six) with word labels was **91.8%**. The literal "always one" prediction held
+for Jev and failed for Kev and Laya.
 
-Jev's reported input-token usage for the 2,880 successful replies corresponds
-to approximately $0.0479 at the documented price. This excludes failed
-attempts and is not a provider invoice.
+![Mean returned probability by semantic die face, model, and label form; the dashed baseline is one-sixth](images/decision-models-face-probabilities.png)
 
-![Measured probabilities by die face for Jev, Kev, and Laya](images/decision-models-are-not-calculators-cover.png)
+We grouped probabilities by the *face* named in the alternative, not by where
+that alternative sat in the list. Moving `six` from first to last did not
+change which face its probability belonged to. The dashed line is the known
+one-in-six baseline for an unseen fair roll; it is not a probability measured
+by any of the models.
 
-See the [full summary](results/summary.json),
-[exact example requests and replies](results/examples.json),
-[checksummed release manifest](results/release-manifest.json),
-[Jev response archive](data/answers/jev-responses.jsonl.gz),
-[Kev response archive](data/answers/kev-responses.jsonl.gz), and
-[Laya response archive](data/answers/laya-responses.jsonl.gz). The
-[face-probability plot](images/decision-models-face-probabilities.png) and
-[choice-position plot](images/decision-models-option-position.png) show the
-representation and ordering effects.
+## The list has a gravity of its own
 
-One concrete request used this state: `A fair six-sided die was rolled once.
-The result is unknown.` It asked `Which face showed on the roll?` with the
-six digit labels `1` through `6` as alternatives. For that order, Jev replied
-`1` (probability for one `0.88`); Kev replied `6` (probability for six
-`0.1975`); Laya replied `1` (probability for one `0.3988`). Those are
-individual replies, not representative averages. The
-linked examples preserve the full request envelopes and unedited model replies.
+The order of alternatives changed the pattern for Kev and Laya. In the first
+digit pass, Kev selected the **first-listed choice 426 of 720 times** (59.2%),
+even though each face spent exactly 120 of those orders in first position.
+Laya selected the **last-listed choice zero times** in that pass. Jev always
+selected face one, wherever it appeared, so its selected positions were
+evenly split: 120 at each of the six positions.
 
-Benford’s Law describes the first digits of certain *observed numerical
-datasets*. This experiment does not inspect training data and cannot establish
-Benford’s Law as the cause of any model behavior. A die with an unobserved fair
-roll has a one-in-six probability for each face; these model replies are not
-measurements of that roll.
+![Selected-option share by list position for each model and label form](images/decision-models-option-position.png)
 
-## Study protocol
+Changing the labels from digits to words, while keeping the corresponding
+order, changed the selected face in **324 of 720 paired orders for Kev** and
+**129 of 720 for Laya** in the first pass. It changed none of Jev's choices.
+On exact repeats, all three models selected the same face for every matching
+request. Kev's and Laya's returned probabilities were identical on repeat;
+Jev's moved slightly without changing its choice. These are repeated model
+responses, not independent observations of die rolls.
 
-The frozen protocol is in [`docs/PREREGISTERED.md`](docs/PREREGISTERED.md).
-Release status and limitations are in [`results/README.md`](results/README.md).
-The [measurement note](docs/measurement-notes.md) records Jev's two-decimal
-probability rounding and the transparent validator correction.
+## What Benford's Law can—and cannot—explain
 
-## Run the harness
+Jev's result is compatible with the original intuition: it acts as though one
+has a strong prior even when the question supplies no evidence favoring that
+face. But **compatibility is not causation**. We did not inspect the models'
+training corpora, count their numeral tokens, or vary the training data. We
+cannot attribute Jev's behavior to Benford's Law, nor can we say why Kev and
+Laya returned different patterns. The three outcomes do rule out the broad
+claim that decision models *always* predict one in this setup.
+
+Benford's Law describes the leading-digit distribution of certain observed
+numerical datasets. It does not say a fair die lands on one more often, and it
+does not by itself tell us how often a model saw the token `1`. The known
+probability of each unseen die face remains one in six. A model's choice
+probabilities describe its response to the prompt, not evidence about the
+hidden roll.
+
+If your application needs a fair die, use a random-number generator. If it
+needs a model to compare options, test the model on the decision distribution
+you care about. Rotate the alternatives, try equivalent labels, retain the
+returned probabilities, and pin the build. A structured response can be
+perfectly valid while carrying a preference you never intended to ask for.
+
+## Reproduce and inspect the study
+
+The [full summary](results/summary.json), [example requests and responses](results/examples.json),
+and [checksummed release manifest](results/release-manifest.json) are public.
+The complete answer archives are available for [Jev](data/answers/jev-responses.jsonl.gz),
+[Kev](data/answers/kev-responses.jsonl.gz), and
+[Laya](data/answers/laya-responses.jsonl.gz). The frozen study design is in
+[`docs/PREREGISTERED.md`](docs/PREREGISTERED.md); [release notes and limitations](results/README.md),
+[engine build notes](docs/engines.md), and the [measurement note](docs/measurement-notes.md)
+document what was run and how Jev's rounded probabilities were handled.
 
 Python 3.12 or newer is required. The core harness and replay need only the
-standard library; engines and plots have separate optional dependencies.
+standard library; engines and plots have separate optional dependencies. The
+commands below are for reproducing or extending the released study; reading
+the archives and regenerating the summary makes no model calls.
 
 ```sh
 python -m venv .venv
@@ -120,7 +204,7 @@ python -m pip install -e '.[charts]'
 decision-models charts
 ```
 
-## Reproduce the published results
+### Regenerate the published results
 
 The complete release was created with `decision-models release` and
 `decision-models charts`. Both commands require all three complete engines
@@ -132,5 +216,6 @@ coverage and regenerates the article data from the raw answer record.
 
 ## License
 
-The harness is MIT-licensed. Model code, weights, and services retain their
-authors' terms; see the build notes before running an engine.
+This repository's harness is [MIT-licensed](LICENSE). Model code, weights, and
+services retain their authors' terms; see the [build notes](docs/engines.md)
+before running an engine.

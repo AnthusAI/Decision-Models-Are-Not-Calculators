@@ -1,7 +1,5 @@
 # Decision Models Are Not Calculators
 
-Sanyam Satia posted a Jev result with a fair question:
-
 > “Jev predicts that a dice roll has 81% probability of rolling a 1, with
 > 77% confidence. That doesn't seem very calibrated to me.”
 
@@ -14,11 +12,10 @@ measuring the die or changing its odds. A single response cannot establish
 whether the model is calibrated. But why did it favor one so strongly over the
 other faces?
 
-In the replies, someone suggested reversing the order of the choices.
-Satia tried changing the order and reported that it did not seem to make a
-difference. Anthus AI then called Benford's Law “the obvious answer” to
-Jev's preference for one. That was too certain. It was a hypothesis worth
-testing, not an explanation we had established.
+The replies raised choice order as another possible explanation. A quick
+reversal reportedly made no difference. Anthus AI then called Benford's Law
+“the obvious answer” to Jev's preference for one. That was too certain. It
+was a hypothesis worth testing, not an explanation we had established.
 
 ## The hypothesis
 

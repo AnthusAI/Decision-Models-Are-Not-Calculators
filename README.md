@@ -32,6 +32,10 @@ paired orders in Kev, 129 in Laya, and none in Jev. Exact repeats selected
 the same face in every case for all three models; Jev's returned probabilities
 varied slightly, while Kev's and Laya's were identical.
 
+Jev's reported input-token usage for the 2,880 successful replies corresponds
+to approximately $0.0479 at the documented price. This excludes failed
+attempts and is not a provider invoice.
+
 ![Measured probabilities by die face for Jev, Kev, and Laya](images/decision-models-are-not-calculators-cover.png)
 
 See the [full summary](results/summary.json),

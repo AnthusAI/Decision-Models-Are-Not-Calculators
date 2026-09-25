@@ -25,7 +25,7 @@
     "kev",
     "laya"
   ],
-  "created_at": "2026-09-25T16:22:44.602689+00:00",
+  "created_at": "2026-09-25T16:42:46.121881+00:00",
   "engine_provenance": {
     "jev": {
       "engine": "jev",
@@ -82,6 +82,11 @@
   },
   "expected_total_responses": 8640,
   "incomplete_engines": [],
+  "recorded_success_input_cost_usd": {
+    "jev": 0.04790016,
+    "kev": 0.0,
+    "laya": 0.0
+  },
   "release_generator_environment": {
     "benford_decisions": "0.1.0",
     "huggingface-hub": "1.16.1",

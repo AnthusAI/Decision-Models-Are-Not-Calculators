@@ -147,6 +147,10 @@ def build_release(data_dir: Path, results_dir: Path, allow_incomplete: bool = Fa
                 "release_generator_environment": environment,
                 "engine_provenance": engine_provenance,
                 "response_model_ids": response_model_ids,
+                "recorded_success_input_cost_usd": {
+                    engine: round(sum(float(row.get("cost_usd", 0)) for row in rows), 8)
+                    for engine, rows in rows_by_engine.items()
+                },
                 "archives": release_files}
     (results_dir / "release-manifest.json").write_text(
         json.dumps(manifest, indent=2, sort_keys=True, allow_nan=False) + "\n", encoding="utf-8")
